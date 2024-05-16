@@ -1,1 +1,1 @@
-# FinalProjectInteractiveGraphics_TroiloGiada
+# Final Project Interactive Graphics Troilo Giada
