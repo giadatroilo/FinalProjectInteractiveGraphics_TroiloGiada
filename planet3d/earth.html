@@ -82,8 +82,8 @@
 	var perspectiveMatrix;	// perspective projection matrix
 	var rotX=0, rotY=0, transZ=3, autorot=0;
 
-	var earthUrl = 'https://raw.githubusercontent.com/giadatroilo/FinalProjectInteractiveGraphics_TroiloGiada/main/earth.obj';
-	var earthmapUrl = 'https://raw.githubusercontent.com/giadatroilo/FinalProjectInteractiveGraphics_TroiloGiada/main/earth.jpg'
+	var earthUrl = 'https://raw.githubusercontent.com/giadatroilo/FinalProjectInteractiveGraphics_TroiloGiada/main/img/Earth/earth.obj';
+	var earthmapUrl = 'https://raw.githubusercontent.com/giadatroilo/FinalProjectInteractiveGraphics_TroiloGiada/main/img/Earth/earth.jpg'
 	// Called once to initialize
 	function InitWebGL()
 	{
@@ -290,7 +290,7 @@
 	}
 	
 	function LoadObj() {
-		fetch('https://raw.githubusercontent.com/giadatroilo/FinalProjectInteractiveGraphics_TroiloGiada/main/earth.obj')
+		fetch('https://raw.githubusercontent.com/giadatroilo/FinalProjectInteractiveGraphics_TroiloGiada/main/img/Earth/earth.obj')
 			.then(response => response.text())
 			.then(data => {
 				var mesh = new ObjMesh;
