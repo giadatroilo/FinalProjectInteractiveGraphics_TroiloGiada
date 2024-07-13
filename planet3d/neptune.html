@@ -84,7 +84,7 @@
 	var perspectiveMatrix;	// perspective projection matrix
 	var rotX=0, rotY=0, transZ=3, autorot=0;
 
-	var nepmapUrl = 'https://raw.githubusercontent.com/giadatroilo/FinalProjectInteractiveGraphics_TroiloGiada/main/neptunemap.jpg'
+	var nepmapUrl = 'https://raw.githubusercontent.com/giadatroilo/FinalProjectInteractiveGraphics_TroiloGiada/main/img/Neptune/neptunemap.jpg'
 	// Called once to initialize
 	function InitWebGL()
 	{
@@ -296,7 +296,7 @@
 	}
 	
 	function LoadObj() {
-		fetch('https://raw.githubusercontent.com/giadatroilo/FinalProjectInteractiveGraphics_TroiloGiada/main/neptune.obj')
+		fetch('https://raw.githubusercontent.com/giadatroilo/FinalProjectInteractiveGraphics_TroiloGiada/main/img/Neptune/neptune.obj')
 			.then(response => response.text())
 			.then(data => {
 				var mesh = new ObjMesh;
