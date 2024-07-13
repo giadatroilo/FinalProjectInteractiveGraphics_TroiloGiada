@@ -84,6 +84,7 @@
 	var perspectiveMatrix;	// perspective projection matrix
 	var rotX=0, rotY=0, transZ=3, autorot=0;
 
+	var mercuryUrl = 'https://raw.githubusercontent.com/giadatroilo/FinalProjectInteractiveGraphics_TroiloGiada/main/img/Mercury/mercury.obj';
 	var mercurymapUrl = 'https://raw.githubusercontent.com/giadatroilo/FinalProjectInteractiveGraphics_TroiloGiada/main/img/Mercury/mercurymap.jpg'
 	// Called once to initialize
 	function InitWebGL()
@@ -105,7 +106,7 @@
 		boxDrawer  = new BoxDrawer();
 		meshDrawer = new MeshDrawer();
 		
-		LoadObj();
+		LoadObj(mercuryUrl, meshDrawer);
 		LoadTexture(mercurymapUrl, meshDrawer);
 		// Set the viewport size
 		UpdateCanvasSize();
@@ -162,193 +163,6 @@
 		var nrmTrans = [ mv[0],mv[1],mv[2], mv[4],mv[5],mv[6], mv[8],mv[9],mv[10] ];
 		meshDrawer.draw( mvp, mv, nrmTrans );
 		
-	}
-	
-	// This is a helper function for compiling the given vertex and fragment shader source code into a program.
-	function InitShaderProgram( vsSource, fsSource, wgl=gl )
-	{
-		const vs = CompileShader( wgl.VERTEX_SHADER,   vsSource, wgl );
-		const fs = CompileShader( wgl.FRAGMENT_SHADER, fsSource, wgl );
-	
-		const prog = wgl.createProgram();
-		wgl.attachShader(prog, vs);
-		wgl.attachShader(prog, fs);
-		wgl.linkProgram(prog);
-	
-		if (!wgl.getProgramParameter(prog, wgl.LINK_STATUS)) {
-			alert('Unable to initialize the shader program: ' + wgl.getProgramInfoLog(prog));
-			return null;
-		}
-		return prog;
-	}
-	
-	// This is a helper function for compiling a shader, called by InitShaderProgram().
-	function CompileShader( type, source, wgl=gl )
-	{
-		const shader = wgl.createShader(type);
-		wgl.shaderSource(shader, source);
-		wgl.compileShader(shader);
-		if (!wgl.getShaderParameter( shader, wgl.COMPILE_STATUS) ) {
-			alert('An error occurred compiling shader:\n' + wgl.getShaderInfoLog(shader));
-			wgl.deleteShader(shader);
-			return null;
-		}
-		return shader;
-	}
-	
-	// Multiplies two matrices and returns the result A*B.
-	// The arguments A and B are arrays, representing column-major matrices.
-	function MatrixMult( A, B )
-	{
-		var C = [];
-		for ( var i=0; i<4; ++i ) {
-			for ( var j=0; j<4; ++j ) {
-				var v = 0;
-				for ( var k=0; k<4; ++k ) {
-					v += A[j+4*k] * B[k+4*i];
-				}
-				C.push(v);
-			}
-		}
-		return C;
-	}
-	
-	///////////////////////////////////////////////////////////////////////////////////
-	</script>
-	
-	<script type="text/javascript">
-	///////////////////////////////////////////////////////////////////////////////////
-	// Below are the main UI control and SVG update functions.
-	///////////////////////////////////////////////////////////////////////////////////
-	
-	var showBox = false;
-	
-	window.onload = function() {
-		InitWebGL();
-		lightView = new LightView();
-		canvas.zoom = function( s ) {
-			transZ *= s/canvas.height + 1;
-			UpdateProjectionMatrix();
-			DrawScene();
-		}
-		canvas.onwheel = function() { canvas.zoom(0.3*event.deltaY); }
-		canvas.onmousedown = function() {
-			var cx = event.clientX;
-			var cy = event.clientY;
-			if ( event.ctrlKey ) {
-				canvas.onmousemove = function() {
-					canvas.zoom(5*(event.clientY - cy));
-					cy = event.clientY;
-				}
-			} else {
-				canvas.onmousemove = function() {
-					rotY += (cx - event.clientX)/canvas.width*5;
-					rotX += (cy - event.clientY)/canvas.height*5;
-					cx = event.clientX;
-					cy = event.clientY;
-					UpdateProjectionMatrix();
-					DrawScene();
-				}
-			}
-		}
-		canvas.onmouseup = canvas.onmouseleave = function() {
-			canvas.onmousemove = null;
-		}
-		
-		SetShininess( document.getElementById('shininess-exp') );
-		
-		DrawScene();
-	};
-	function WindowResize()
-	{
-		UpdateCanvasSize();
-		DrawScene();
-	}
-	
-	var timer;
-	function AutoRotate( param )
-	{
-		if ( param.checked ) {
-			timer = setInterval( function() {
-					var v = document.getElementById('rotation-speed').value;
-					autorot += 0.0005 * v;
-					if ( autorot > 2*Math.PI ) autorot -= 2*Math.PI;
-					DrawScene();
-				}, 30
-			);
-			document.getElementById('rotation-speed').disabled = false;
-		} else {
-			clearInterval( timer );
-			document.getElementById('rotation-speed').disabled = true;
-		}
-	}
-	
-	function ShowTexture( param )
-	{
-		meshDrawer.showTexture( param.checked );
-		DrawScene();
-	}
-	
-	function SwapYZ( param )
-	{
-		meshDrawer.swapYZ( param.checked );
-		DrawScene();
-	}
-	
-	function LoadObj() {
-		fetch('https://raw.githubusercontent.com/giadatroilo/FinalProjectInteractiveGraphics_TroiloGiada/main/img/Mercury/mercury.obj')
-			.then(response => response.text())
-			.then(data => {
-				var mesh = new ObjMesh;
-				mesh.parse( data ); // Usa data per ottenere il contenuto del file
-				var box = mesh.getBoundingBox();
-				var shift = [
-					-(box.min[0]+box.max[0])/2,
-					-(box.min[1]+box.max[1])/2,
-					-(box.min[2]+box.max[2])/2
-				];
-				var size = [
-					(box.max[0]-box.min[0])/2,
-					(box.max[1]-box.min[1])/2,
-					(box.max[2]-box.min[2])/2
-				];
-				var maxSize = Math.max( size[0], size[1], size[2] );
-				var scale = 1 / maxSize;
-				mesh.shiftAndScale( shift, scale );
-				var buffers = mesh.getVertexBuffers();
-				meshDrawer.setMesh( buffers.positionBuffer, buffers.texCoordBuffer, buffers.normalBuffer );
-				DrawScene();
-			})
-			.catch(error => {
-				console.error('Fetch error:', error);
-			});
-	}
-	
-	
-	function LoadTexture(textureUrl, drawer) {
-		fetch(textureUrl)
-			.then(response => response.blob())
-			.then(blob => {
-				var url = URL.createObjectURL(blob);
-				var img = new Image();
-				img.onload = function() {
-					drawer.setTexture(img);
-					DrawScene();
-				};
-				img.src = url;
-			})
-			.catch(error => {
-				console.error('Error loading texture:', error);
-			});
-	}
-	
-	function SetShininess( param )
-	{
-		var exp = param.value;
-		var s = Math.pow(10,exp/25);
-		document.getElementById('shininess-value').innerText = s.toFixed( s < 10 ? 2 : 0 );
-		meshDrawer.setShininess(s);
-		DrawScene();
 	}
 	
 	///////////////////////////////////////////////////////////////////////////////////
