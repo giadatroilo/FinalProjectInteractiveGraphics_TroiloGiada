@@ -72,7 +72,7 @@ document.addEventListener('DOMContentLoaded', () => {
         };
     }
 
-    let animationEnabled = true; // Flag per controllare lo stato dell'animazione
+    let animationEnabled = false; // Flag per controllare lo stato dell'animazione
 
     // Funzione per gestire il click su un pianeta
     function handlePlanetClick(planetName) {
