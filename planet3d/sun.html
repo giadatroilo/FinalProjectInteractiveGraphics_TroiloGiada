@@ -85,7 +85,7 @@ var canvas, gl;
 var perspectiveMatrix;	// perspective projection matrix
 var rotX=0, rotY=0, transZ=3, autorot=0;
 
-var sunmapUrl = 'https://raw.githubusercontent.com/giadatroilo/FinalProjectInteractiveGraphics_TroiloGiada/main/sunmap.jpg';
+var sunmapUrl = 'https://raw.githubusercontent.com/giadatroilo/FinalProjectInteractiveGraphics_TroiloGiada/main/img/Sun/sunmap.jpg';
 // Called once to initialize
 function InitWebGL()
 {
@@ -297,7 +297,7 @@ function SwapYZ( param )
 }
 
 function LoadObj() {
-    fetch('https://raw.githubusercontent.com/giadatroilo/FinalProjectInteractiveGraphics_TroiloGiada/img/sun.obj')
+    fetch('https://raw.githubusercontent.com/giadatroilo/FinalProjectInteractiveGraphics_TroiloGiada/main/img/Sun/sun.obj')
         .then(response => response.text())
         .then(data => {
             var mesh = new ObjMesh;
