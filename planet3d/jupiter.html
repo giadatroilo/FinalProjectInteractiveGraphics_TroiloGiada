@@ -86,7 +86,7 @@
 	var perspectiveMatrix;	// perspective projection matrix
 	var rotX=0, rotY=0, transZ=3, autorot=0;
 
-	var jupmapUrl = 'https://raw.githubusercontent.com/giadatroilo/FinalProjectInteractiveGraphics_TroiloGiada/main/jupitermap.jpg'
+	var jupmapUrl = 'https://raw.githubusercontent.com/giadatroilo/FinalProjectInteractiveGraphics_TroiloGiada/main/img/Jupiter/jupitermap.jpg'
 	// Called once to initialize
 	function InitWebGL()
 	{
@@ -293,7 +293,7 @@
 	}
 	
 	function LoadObj() {
-		fetch('https://raw.githubusercontent.com/giadatroilo/FinalProjectInteractiveGraphics_TroiloGiada/main/jupiter.obj')
+		fetch('https://raw.githubusercontent.com/giadatroilo/FinalProjectInteractiveGraphics_TroiloGiada/main/img/Jupiter/jupiter.obj')
 			.then(response => response.text())
 			.then(data => {
 				var mesh = new ObjMesh;
