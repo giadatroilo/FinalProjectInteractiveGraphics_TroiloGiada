@@ -5,8 +5,6 @@
 	<script type="text/javascript" id="includedscript" src="planet3d.js"></script>
 	<script type="text/javascript" src="obj.js"></script>
 	
-	
-	
 	<script type="text/javascript">
 		
 		class BoxDrawer {
@@ -84,7 +82,7 @@
 	var perspectiveMatrix;	// perspective projection matrix
 	var rotX=0, rotY=0, transZ=3, autorot=0;
 
-	var jupmapUrl = 'https://raw.githubusercontent.com/giadatroilo/FinalProjectInteractiveGraphics_TroiloGiada/main/uranusmap.jpg'
+	var jupmapUrl = 'https://raw.githubusercontent.com/giadatroilo/FinalProjectInteractiveGraphics_TroiloGiada/main/img/Uranus/uranusmap.jpg'
 	// Called once to initialize
 	function InitWebGL()
 	{
@@ -296,7 +294,7 @@
 	}
 	
 	function LoadObj() {
-		fetch('https://raw.githubusercontent.com/giadatroilo/FinalProjectInteractiveGraphics_TroiloGiada/main/uranus.obj')
+		fetch('https://raw.githubusercontent.com/giadatroilo/FinalProjectInteractiveGraphics_TroiloGiada/main/img/Uranus/uranus.obj')
 			.then(response => response.text())
 			.then(data => {
 				var mesh = new ObjMesh;
