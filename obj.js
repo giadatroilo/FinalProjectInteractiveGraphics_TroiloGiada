@@ -13,12 +13,18 @@ class ObjMesh
 	}
 	
 	// Reads the obj file at the given URL and parses it.
-	load( url )
+	load( url , callback)
 	{
-		var xhttp = new XMLHttpRequest();
+		const self = this;
+		const xhttp = new XMLHttpRequest();
 		xhttp.onreadystatechange = function() {
-			if (this.readyState == 4 && this.status == 200) {
-				parse( this.responseText );
+			if (this.readyState == 4) {
+
+				if( this.status == 200) {
+					self.parse( this.responseText );
+				} else {
+					console.error('error loading file');
+				}
 			}
 		};
 		xhttp.open("GET", url, true);

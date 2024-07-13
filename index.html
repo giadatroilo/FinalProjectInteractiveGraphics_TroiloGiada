@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistema Solare</title>
+    <link type="text/css" rel="stylesheet" href="bulma.css">
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            overflow-x: hidden;
+            color: white;
+            background-color: black; 
+        }
+        
+	input[type=checkbox], label {
+		cursor: hand;
+	}
+	input[type=range] {
+		width: 100%;
+	}
+	#canvas {
+		display: block;
+		position: absolute;
+		top:  0;
+		left: 0;
+		width:  100%;
+		height: 100%;
+	}
+	#canvas-div {
+		position: relative;
+	}
+	#controls-div {
+		vertical-align: top;
+		background-color: #333;
+		overflow: auto;
+	}
+	#controls {
+		padding: 1em;
+	}
+	.control-group {
+		position: relative;
+		max-width: 12em;
+	}
+	.control {
+		padding: 0.2em;
+	}
+    
+	#scale-label {
+		float: left;
+	}
+	#scale-value {
+		float: right;
+		text-align: right;
+		width: 4em;
+	}
+
+        h1, h3, h6, a {
+            color: white !important;
+        }
+
+        .title-section {
+            background-color: rgba(0, 0, 0, 0.5); /* Sfondo semi-trasparente per il titolo */
+            padding: 20px;
+        }
+
+        /* Esempio di stili CSS per il tooltip, se necessario */
+        .tooltip {
+            position: relative;
+            display: inline-block;
+        }
+
+        .tooltip .tooltiptext {
+            visibility: hidden;
+            width: 120px;
+            background-color: black;
+            color: #fff;
+            text-align: center;
+            border-radius: 6px;
+            padding: 5px 0;
+            position: absolute;
+            z-index: 1;
+            bottom: 125%;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+
+        .tooltip:hover .tooltiptext {
+            visibility: visible;
+        }
+
+
+        .solar-system-section {
+            height: 80vh; /* Altezza fissa per la sezione del sistema solare */
+            background: url('img/sky.png') no-repeat center center fixed;
+            background-size: cover;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+        }
+
+        .solar-system {
+            position: relative;
+            width: 100vw;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 0;
+        }
+
+        .sun {
+            position: absolute;
+            width: 70px;
+            height: 70px;
+            background: url('img/sun.jpg') no-repeat center;
+            background-size: cover;
+            border-radius: 50%;
+            z-index: 1;
+        }
+
+        .orbit {
+            position: absolute;
+            border: 1px dashed rgba(255, 255, 255, 0.5);
+            border-radius: 50%;
+        }
+
+        .planet {
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            background: white;
+            border-radius: 50%;
+            z-index: 1;
+        }
+
+        .mercury-orbit { width: 100px; height: 100px; }
+        .venus-orbit { width: 150px; height: 150px; }
+        .earth-orbit { width: 200px; height: 200px; }
+        .mars-orbit { width: 250px; height: 250px; }
+        .jupiter-orbit { width: 300px; height: 300px; }
+        .saturn-orbit { width: 350px; height: 350px; }
+        .uranus-orbit { width: 400px; height: 400px; }
+        .neptune-orbit { width: 450px; height: 450px; }
+
+        .Mercury { background: url('img/mercury.png') no-repeat center; background-size: cover; top: 50%; left: 100%; transform: translate(-50%, -50%); }
+        .Venus { background: url('img/venus.jpg') no-repeat center; background-size: cover; top: 50%; left: 100%; transform: translate(-50%, -50%); }
+        .Earth { background: url('img/earth.png') no-repeat center; background-size: cover; top: 50%; left: 100%; transform: translate(-50%, -50%); }
+        .Mars { background: url('img/mars.png') no-repeat center; background-size: cover; top: 50%; left: 100%; transform: translate(-50%, -50%); }
+        .Jupiter { background: url('img/jupiter.png') no-repeat center; background-size: cover; top: 50%; left: 100%; transform: translate(-50%, -50%); }
+        .Saturn { background: url('img/saturn.jpg') no-repeat center; background-size: cover; top: 50%; left: 100%; transform: translate(-50%, -50%); }
+        .Uranus { background: url('img/uranus.jpg') no-repeat center; background-size: cover; top: 50%; left: 100%; transform: translate(-50%, -50%); }
+        .Neptune { background: url('img/neptune.jpg') no-repeat center; background-size: cover; top: 50%; left: 100%; transform: translate(-50%, -50%); }
+
+        .info-section {
+            background-color: black;
+            padding: 20px;
+        }
+        .instruction-text {
+            position: absolute;
+            top: 20px; /* Posizionamento verticale desiderato, ad esempio 20px dal top */
+            right: 20px; /* Posizione a destra, ad esempio 20px dalla destra */
+            color: white; /* Colore del testo */
+            padding: 10px; /* Spaziatura interna */
+        }
+    </style>
+</head>
+<body>
+    <section class="section title-section">
+        <h1 class="title is-1 has-text-centered">An interactive Solar System</h1>
+        <h3 class="subtitle has-text-centered"><strong> Explore the planets</strong></h3>
+    </section>
+        <div class="column is-one-quarter has-text-right">
+            <label class="checkbox">
+                <input id="animateCheckbox" type="checkbox">
+                Animate
+            </label>
+        </div>
+        
+        <div class="control">
+            <span id="scale">Set scale of velocities:</span>
+            <span id="scale-value">1</span>
+            <input id="scale-input" type="number" step="0.01" value="1" oninput="SetScale(this)"/>
+            
+        </div>
+        <div class="column is-one-quarter has-text-right">
+            <a href="3D solar system.html">Click here to view the 3D Solar System</a>
+        </div>
+        <div class="column is-one-quarter has-text-right">
+            <label>Click on a planet to view its 3D model</label> 
+        </div>
+    <section class="solar-system-section">
+    <div class="solar-system">
+        <!-- Sole con attributo data-planet per indicare il nome -->
+        <div class="sun" title="Sun" data-planet="Sun"></div>
+        <!-- Pianeti con attributo data-planet -->
+        <div class="orbit mercury-orbit"><div class="planet Mercury" title="Mercury" data-planet="Mercury"></div></div>
+        <div class="orbit venus-orbit"><div class="planet Venus" title="Venus" data-planet="Venus"></div></div>
+        <div class="orbit earth-orbit"><div class="planet Earth" title="Earth" data-planet="Earth"></div></div>
+        <div class="orbit mars-orbit"><div class="planet Mars" title="Mars" data-planet="Mars"></div></div>
+        <div class="orbit jupiter-orbit"><div class="planet Jupiter" title="Jupiter" data-planet="Jupiter"></div></div>
+        <div class="orbit saturn-orbit"><div class="planet Saturn" title="Saturno" data-planet="Saturn"></div></div>
+        <div class="orbit uranus-orbit"><div class="planet Uranus" title="Uranus" data-planet="Uranus"></div></div>
+        <div class="orbit neptune-orbit"><div class="planet Neptune" title="Neptune" data-planet="Neptune"></div></div>
+        
+    </div>
+</section>
+
+
+    <section class="section info-section">
+        <div class="container">
+            <h2 class="title is-2">Information about the Solar System</h2>
+<p>The Solar System consists of the Sun and all celestial objects that orbit it, including planets, their moons, dwarf planets, and countless smaller objects.</p>
+<h3 class="title is-3">The Planets</h3>
+<ul>
+    <li><strong>Mercury:</strong> The closest planet to the Sun.</li>
+    <li><strong>Venus:</strong> The brightest planet in the night sky.</li>
+    <li><strong>Earth:</strong> The only known planet to host life.</li>
+    <li><strong>Mars:</strong> Known as the Red Planet.</li>
+    <li><strong>Jupiter:</strong> The largest planet in the Solar System.</li>
+    <li><strong>Saturn:</strong> Famous for its spectacular rings.</li>
+    <li><strong>Uranus:</strong> Has a unique tilted orbit.</li>
+    <li><strong>Neptune:</strong> Known for its strong winds.</li>
+</ul>
+
+        </div>
+    </section>
+    
+    <script src="project.js"></script>
+</body>
+</html>
