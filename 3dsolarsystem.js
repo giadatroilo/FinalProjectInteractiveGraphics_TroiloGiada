@@ -68,6 +68,47 @@ var boxFS = `
 ///////////////////////////////////////////////////////////////////////////////////
 // Below is the cclass for drawing the orbits
 ///////////////////////////////////////////////////////////////////////////////////
+
+
+class OrbitDrawer {
+    constructor(radius, segments) {
+        this.prog = InitShaderProgram(orbitVS, orbitFS);
+
+        // Get the ids of the uniform variables in the shaders
+        this.mvp = gl.getUniformLocation(this.prog, 'mvp');
+
+        // Get the ids of the vertex attributes in the shaders
+        this.vertPos = gl.getAttribLocation(this.prog, 'pos');
+
+        // Create the buffer objects
+        this.vertbuffer = gl.createBuffer();
+
+        var pos = this.createOrbit(radius, segments);
+        gl.bindBuffer(gl.ARRAY_BUFFER, this.vertbuffer);
+        gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(pos), gl.STATIC_DRAW);
+    }
+
+    createOrbit(radius, segments) {
+        var orbitVertices = [];
+        for (var i = 0; i <= segments; i++) {
+            var angle = 2 * Math.PI * i/segments;
+            var x = radius * Math.cos(angle);
+            var y = radius * Math.sin(angle);
+            orbitVertices.push(x, y, 0);
+        }
+        return orbitVertices;
+    }
+
+    draw(trans) {
+        gl.useProgram(this.prog);
+        gl.uniformMatrix4fv(this.mvp, false, trans);
+        gl.bindBuffer(gl.ARRAY_BUFFER, this.vertbuffer);
+        gl.vertexAttribPointer(this.vertPos, 3, gl.FLOAT, false, 0, 0);
+        gl.enableVertexAttribArray(this.vertPos);
+        gl.drawArrays(gl.LINE_LOOP, 0, 101); // 101 vertices for the orbit
+	}
+}
+
 var orbitVS = `
 	attribute vec3 pos;
 	uniform mat4 mvp;
@@ -85,47 +126,6 @@ var orbitFS = `
 	}
 `;
 
-// Class for drawing orbits
-class OrbitDrawer {
-constructor(radius) {
-	this.prog = InitShaderProgram(orbitVS, orbitFS);
-	this.radius = radius;
-	this.numSegments = 360;  // Number of segments for the circle approximation
-	this.vertexBuffer = gl.createBuffer();
-	this.vertices = [];
-	this.mvp = gl.getUniformLocation(this.prog, 'mvp');
-	this.vertPos = gl.getAttribLocation(this.prog, 'vertPos');
-	this.texCoord = gl.getAttribLocation(this.prog, 'texCoord');
-
-	// Generate vertices for a circle
-	for (let i = 0; i <= this.numSegments; i++) {
-		let theta = (i / this.numSegments) * 2 * Math.PI;
-		let x = this.radius * Math.cos(theta);
-		let y = this.radius * Math.sin(theta);
-		let z = 3;
-		this.vertices.push(x, y, 3);  // Coordinates in 3D space
-	}
-
-	// Bind vertex buffer and load data into buffer
-	gl.bindBuffer(gl.ARRAY_BUFFER, this.vertexBuffer);
-	gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(this.vertices), gl.STATIC_DRAW);
-}
-
-draw(mvp) {
-	gl.useProgram(this.prog); 
-	
-	gl.uniformMatrix4fv(this.mvp, false, mvp);
-
-	// Bind vertex data
-	gl.bindBuffer(gl.ARRAY_BUFFER, this.vertexBuffer);
-	gl.vertexAttribPointer(this.vertPos, 3, gl.FLOAT, false, 0, 0);
-	gl.enableVertexAttribArray(this.vertPos);
-
-	// Draw the orbit path
-	gl.drawArrays(gl.LINE_STRIP, 0, this.numSegments + 1);
-}
-}
-
 var meshDrawer1;
 var meshDrawer2;
 var meshDrawer3;
@@ -135,6 +135,7 @@ var meshDrawer6;
 var meshDrawer7;
 var meshDrawer8;
 var meshDrawer9;
+var orbitDrawers = [];
 
 var sunUrl = 'https://raw.githubusercontent.com/giadatroilo/FinalProjectInteractiveGraphics_TroiloGiada/main/img/Sun/sun.obj';
 var mercuryUrl = 'https://raw.githubusercontent.com/giadatroilo/FinalProjectInteractiveGraphics_TroiloGiada/main/img/Mercury/mercury.obj';
@@ -144,7 +145,7 @@ var marsUrl = 'https://raw.githubusercontent.com/giadatroilo/FinalProjectInterac
 var jupUrl = 'https://raw.githubusercontent.com/giadatroilo/FinalProjectInteractiveGraphics_TroiloGiada/main/img/Jupiter/jupiter.obj';
 var satUrl = 'https://raw.githubusercontent.com/giadatroilo/FinalProjectInteractiveGraphics_TroiloGiada/main/img/Saturn/saturn.obj';
 var urUrl = 'https://raw.githubusercontent.com/giadatroilo/FinalProjectInteractiveGraphics_TroiloGiada/main/img/Uranus/uranus.obj';
-var nepUrl = 'https://raw.githubusercontent.com/giadatroilo/FinalProjectInteractiveGraphics_TroiloGiada/main/img/Neptuneneptune.obj'
+var nepUrl = 'https://raw.githubusercontent.com/giadatroilo/FinalProjectInteractiveGraphics_TroiloGiada/main/img/Neptune/neptune.obj'
 
 var sunmapUrl = 'https://raw.githubusercontent.com/giadatroilo/FinalProjectInteractiveGraphics_TroiloGiada/main/img/Sun/sunmap.jpg'
 var mercurymapUrl = 'https://raw.githubusercontent.com/giadatroilo/FinalProjectInteractiveGraphics_TroiloGiada/main/img/Mercury/mercurymap.jpg'
@@ -162,6 +163,7 @@ var rotX=0, rotY=0, transZ=50;
 var autorot1 = 0, autorot2 = 0, autorot3 = 0, autorot4 = 0, autorot5 = 0, autorot6 = 0, autorot7 = 0, autorot8 = 0, autorot9 = 0;
 var Autorot2 = 0, Autorot3 = 0, Autorot4 = 0, Autorot5 = 0, Autorot6 = 0, Autorot7 = 0, Autorot8 = 0, Autorot9 = 0;
 var animationActive = false; 
+var orbitsActive = false; 
 
 // Called once to initialize
 function InitWebGL()
@@ -180,7 +182,6 @@ function InitWebGL()
 	gl.enable(gl.DEPTH_TEST);
 	
 	// Initialize the programs and buffers for drawing
-	
 	meshDrawer1 = new MeshDrawer();
 	meshDrawer2 = new MeshDrawer();
 	meshDrawer3 = new MeshDrawer();
@@ -191,6 +192,15 @@ function InitWebGL()
 	meshDrawer8 = new MeshDrawer();
 	meshDrawer9 = new MeshDrawer();
 
+	const ORBIT_SEGMENTS = 100;
+    orbitDrawers.push(new OrbitDrawer(5, ORBIT_SEGMENTS));
+    orbitDrawers.push(new OrbitDrawer(10, ORBIT_SEGMENTS));
+    orbitDrawers.push(new OrbitDrawer(15, ORBIT_SEGMENTS));
+    orbitDrawers.push(new OrbitDrawer(20, ORBIT_SEGMENTS));
+    orbitDrawers.push(new OrbitDrawer(25, ORBIT_SEGMENTS));
+    orbitDrawers.push(new OrbitDrawer(30, ORBIT_SEGMENTS));
+    orbitDrawers.push(new OrbitDrawer(35, ORBIT_SEGMENTS));
+    orbitDrawers.push(new OrbitDrawer(40, ORBIT_SEGMENTS));
 
 	LoadTexturefromUrl(sunmapUrl, meshDrawer1)
 	LoadObjfromUrl(sunUrl, meshDrawer1);
@@ -211,15 +221,17 @@ function InitWebGL()
 	LoadTexturefromUrl(nepmapUrl, meshDrawer9);
 	LoadObjfromUrl(nepUrl, meshDrawer9);
 	
-
 	// Set the viewport size
 	UpdateCanvasSize();
 
 	const scale = SetScale(document.getElementById('scale-input'));
-	const checkbox = document.getElementById('animateCheckbox');
-    checkbox.addEventListener('change', () => toggleAnimation(checkbox))
-	toggleAnimation(checkbox);
-	
+	const anim_checkbox = document.getElementById('animateCheckbox');
+    anim_checkbox.addEventListener('change', () => toggleAnimation(anim_checkbox))
+	toggleAnimation(anim_checkbox);
+	document.getElementById('orbitCheckbox').addEventListener('change', function() {
+		orbitsActive = this.checked;
+		DrawScene();
+	});
 }
 
 // Called every time the window size is changed.
@@ -241,10 +253,10 @@ function UpdateCanvasSize()
 function UpdateProjectionMatrix() 
 {
 	var r = canvas.width / canvas.height;
-	var n = (transZ - 1.74);
+	var n = (transZ - 174);
 	const min_n = 0.001;
 	if (n < min_n) n = min_n;
-	var f = (transZ + 1.74);
+	var f = (transZ + 174);
 	var fov = 3.145 * 60 / 180;
 	var s = 1 / Math.tan(fov / 2);
 	perspectiveMatrix = [
@@ -345,44 +357,57 @@ function UpdateScene2()
 // This is the main function that handled WebGL drawing
 function DrawScene() 
 {
-	console.log(rotX)
-	var pos1 = getTranslationPosition(0, 0, rotX);
-	var mv1 =  GetModelViewMatrix(pos1.x, pos1.y, transZ, 0, autorot1);
+	var pos1 = getTranslationPosition(0, 0, rotX, rotY);
+	var mv1 =  GetModelViewMatrix(pos1.x, pos1.y, transZ + pos1.z, 0, autorot1);
 	var mvp1 = MatrixMult(perspectiveMatrix, mv1);
 
-	var pos2 = getTranslationPosition(5, Autorot2, rotX);
-	var mv2 = GetModelViewMatrix(pos2.x, pos2.y, transZ, 0, autorot2 + Autorot2);
+	var pos2 = getTranslationPosition(5, Autorot2, rotX, rotY);
+	var mv2 = GetModelViewMatrix(pos2.x, pos2.y, transZ + pos2.z, 0, autorot2 + Autorot2);
 	var mvp2 = MatrixMult(perspectiveMatrix, mv2);
 
-	var pos3 = getTranslationPosition(10, Autorot3, rotX);
-	var mv3 = GetModelViewMatrix(pos3.x, pos3.y, transZ, 0, autorot3 + Autorot3);
+	var pos3 = getTranslationPosition(10, Autorot3, rotX, rotY);
+	var mv3 = GetModelViewMatrix(pos3.x, pos3.y, transZ + pos3.z, 0, autorot3 + Autorot3);
 	var mvp3 = MatrixMult(perspectiveMatrix, mv3);
 
-	var pos4 = getTranslationPosition(15, Autorot4, rotX);
-	var mv4 = GetModelViewMatrix(pos4.x, pos4.y, transZ, 0, autorot4 + Autorot4);
+	var pos4 = getTranslationPosition(15, Autorot4, rotX, rotY);
+	var mv4 = GetModelViewMatrix(pos4.x, pos4.y, transZ + pos4.z, 0, autorot4 + Autorot4);
 	var mvp4 = MatrixMult(perspectiveMatrix, mv4);
 
-	var pos5 = getTranslationPosition(20, Autorot5, rotX);
-	var mv5 = GetModelViewMatrix(pos5.x, pos5.y, transZ, 0, autorot5 + Autorot5);
+	var pos5 = getTranslationPosition(20, Autorot5, rotX, rotY);
+	var mv5 = GetModelViewMatrix(pos5.x, pos5.y, transZ + pos5.z, 0, autorot5 + Autorot5);
 	var mvp5 = MatrixMult(perspectiveMatrix, mv5);
 
-	var pos6 = getTranslationPosition(25, Autorot6, rotX);
-	var mv6 = GetModelViewMatrix(pos6.x, pos6.y, transZ, 0, autorot6 + Autorot6);
+	var pos6 = getTranslationPosition(25, Autorot6, rotX, rotY);
+	var mv6 = GetModelViewMatrix(pos6.x, pos6.y, transZ + pos6.z, 0, autorot6 + Autorot6);
 	var mvp6 = MatrixMult(perspectiveMatrix, mv6);
 
-	var pos7 = getTranslationPosition(30, Autorot7, rotX);
-	var mv7 = GetModelViewMatrix(pos7.x, pos7.y, transZ, 0, autorot7 + Autorot7);
+	var pos7 = getTranslationPosition(30, Autorot7, rotX, rotY);
+	var mv7 = GetModelViewMatrix(pos7.x, pos7.y, transZ + pos7.z, 0, autorot7 + Autorot7);
 	var mvp7 = MatrixMult(perspectiveMatrix, mv7);
 
-	var pos8 = getTranslationPosition(35, Autorot8, rotX);
-	var mv8 = GetModelViewMatrix(pos8.x, pos8.y, transZ, 0, autorot8 + Autorot8);
+	var pos8 = getTranslationPosition(35, Autorot8, rotX, rotY);
+	var mv8 = GetModelViewMatrix(pos8.x, pos8.y, transZ + pos8.z, 0, autorot8 + Autorot8);
 	var mvp8 = MatrixMult(perspectiveMatrix, mv8);
 
-	var pos9 = getTranslationPosition(40, Autorot9, rotX);
-	var mv9 = GetModelViewMatrix(pos9.x, pos9.y, transZ, 0, autorot9 + Autorot9);
+	var pos9 = getTranslationPosition(40, Autorot9, rotX, rotY);
+	var mv9 = GetModelViewMatrix(pos9.x, pos9.y, transZ + pos9.z, 0, autorot9 + Autorot9);
 	var mvp9 = MatrixMult(perspectiveMatrix, mv9);
 	
+	var mvorb =  GetModelViewMatrix(0, 0, transZ, rotX, rotY);
+	var mvporb = MatrixMult(perspectiveMatrix, mvorb);
+
 	gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+
+	if (orbitsActive) {
+		orbitDrawers[0].draw(mvporb);
+		orbitDrawers[1].draw(mvporb);
+		orbitDrawers[2].draw(mvporb);
+		orbitDrawers[3].draw(mvporb);
+		orbitDrawers[4].draw(mvporb);
+		orbitDrawers[5].draw(mvporb);
+		orbitDrawers[6].draw(mvporb);
+		orbitDrawers[7].draw(mvporb);
+	}
 
 	meshDrawer1.draw(mvp1);
 	meshDrawer2.draw(mvp2);
@@ -393,15 +418,83 @@ function DrawScene()
 	meshDrawer7.draw(mvp7);
 	meshDrawer8.draw(mvp8);
 	meshDrawer9.draw(mvp9);
-	
 }
 
-function getTranslationPosition(radius, phi, theta) 
-{
-	return {
-		x: radius * Math.cos(theta) * Math.sin(phi),
-		y: radius * Math.sin(theta) * Math.cos(phi),
-	};
+
+function inverseMatrix3x3(m) {
+    var det = m[0][0] * (m[1][1] * m[2][2] - m[1][2] * m[2][1]) -
+              m[0][1] * (m[1][0] * m[2][2] - m[1][2] * m[2][0]) +
+              m[0][2] * (m[1][0] * m[2][1] - m[1][1] * m[2][0]);
+    
+    if (det === 0) {
+        throw new Error("Matrix is not invertible");
+    }
+
+    var invDet = 1 / det;
+
+    var inv = [
+        [
+            (m[1][1] * m[2][2] - m[1][2] * m[2][1]) * invDet,
+            (m[0][2] * m[2][1] - m[0][1] * m[2][2]) * invDet,
+            (m[0][1] * m[1][2] - m[0][2] * m[1][1]) * invDet
+        ],
+        [
+            (m[1][2] * m[2][0] - m[1][0] * m[2][2]) * invDet,
+            (m[0][0] * m[2][2] - m[0][2] * m[2][0]) * invDet,
+            (m[0][2] * m[1][0] - m[0][0] * m[1][2]) * invDet
+        ],
+        [
+            (m[1][0] * m[2][1] - m[1][1] * m[2][0]) * invDet,
+            (m[0][1] * m[2][0] - m[0][0] * m[2][1]) * invDet,
+            (m[0][0] * m[1][1] - m[0][1] * m[1][0]) * invDet
+        ]
+    ];
+
+    return inv;
+}
+
+function getTranslationPosition(radius, auto, rotX, rotY) {
+
+    var rotXMatrix = [
+        [1, 0, 0],
+        [0, Math.cos(rotX), Math.sin(rotX)],
+        [0, -Math.sin(rotX), Math.cos(rotX)]
+    ];
+
+    var rotYMatrix = [
+        [Math.cos(rotY), 0, -Math.sin(rotY)],
+        [0, 1, 0],
+        [Math.sin(rotY), 0, Math.cos(rotY)]
+    ];
+
+    var rotCombined = MatrixMult3x3(rotYMatrix, rotXMatrix);
+
+    var inv_rot = inverseMatrix3x3(rotCombined);
+
+    var vec = [radius * Math.cos(auto), radius * Math.sin(auto), 0];
+
+    var ris = [
+        inv_rot[0][0] * vec[0] + inv_rot[0][1] * vec[1] + inv_rot[0][2] * vec[2],
+        inv_rot[1][0] * vec[0] + inv_rot[1][1] * vec[1] + inv_rot[1][2] * vec[2],
+        inv_rot[2][0] * vec[0] + inv_rot[2][1] * vec[1] + inv_rot[2][2] * vec[2]
+    ];
+
+    return {
+        x: ris[0],
+        y: ris[1],
+        z: ris[2],
+    };
+}
+
+function MatrixMult3x3(a, b) {
+    var result = [];
+    for (var i = 0; i < 3; i++) {
+        result[i] = [];
+        for (var j = 0; j < 3; j++) {
+            result[i][j] = a[i][0] * b[0][j] + a[i][1] * b[1][j] + a[i][2] * b[2][j];
+        }
+    }
+    return result;
 }
 
 function SetScale(input) {
