@@ -1,14 +1,14 @@
 <doctype html>
     <head>
-        <title>3D SOLAR SYSTEM</title>
-        <script type="text/javascript" id="includedscript" src="3dsolarsystem.js"></script>
+        <title>3D SOLAR SYSTEM proportion</title>
+        <script type="text/javascript" id="includedscript" src="3dsolarsystemrealsize.js"></script>
         <script type="text/javascript" src="obj.js"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/gl-matrix/2.8.1/gl-matrix.js"></script>
     
         <style>
             html {
                 color: white;
-                background: url(img/sky.png);
+                background: black;
                 font-family: Arial;
                 overflow: hidden;
             }
@@ -98,11 +98,22 @@
                 #scale-value {
                     float: right;
                     text-align: right;
-                    width: 4em;
+                    width: 0;
                 }
     
                 #animate-label {
                     float: left;
+                }
+
+                #info-div {
+                    color: white;
+                    padding: 1em;
+                    margin-top: 1em;
+                    border-radius: 1px;
+                    box-shadow: 0 2px 4px rgba(0,0,0,0.5);
+                    position: absolute;
+                    top: 0;
+                    right: 0;
                 }
             }
         </style>
@@ -124,12 +135,10 @@
             </div>
             <div class="control">
                 <span id="scale">Set scale of velocities:</span>
+                <span id="scale-value">1</span>
                 <input id="scale-input" type="number" step="0.01" value="1" oninput="SetScale(this)"/>
-                
             </div>
-            <div class="column is-one-quarter has-text-right">
-                <a href="ss3dRealSize.html">Click here to view the 3D Solar System with the real size</a>
-            </div>
+
             <div id="canvas-div"><canvas id="canvas"></canvas></div>
         </section>
     

@@ -159,7 +159,7 @@ var nepmapUrl = 'https://raw.githubusercontent.com/giadatroilo/FinalProjectInter
 
 var canvas, gl;
 var perspectiveMatrix;	// perspective projection matrix
-var rotX=0, rotY=0, transZ=50;
+var rotX=0, rotY=0, transZ=5;
 var autorot1 = 0, autorot2 = 0, autorot3 = 0, autorot4 = 0, autorot5 = 0, autorot6 = 0, autorot7 = 0, autorot8 = 0, autorot9 = 0;
 var Autorot2 = 0, Autorot3 = 0, Autorot4 = 0, Autorot5 = 0, Autorot6 = 0, Autorot7 = 0, Autorot8 = 0, Autorot9 = 0;
 var animationActive = false; 
@@ -194,32 +194,32 @@ function InitWebGL()
 
 	const ORBIT_SEGMENTS = 100;
     orbitDrawers.push(new OrbitDrawer(5, ORBIT_SEGMENTS));
-    orbitDrawers.push(new OrbitDrawer(10, ORBIT_SEGMENTS));
-    orbitDrawers.push(new OrbitDrawer(15, ORBIT_SEGMENTS));
-    orbitDrawers.push(new OrbitDrawer(20, ORBIT_SEGMENTS));
-    orbitDrawers.push(new OrbitDrawer(25, ORBIT_SEGMENTS));
-    orbitDrawers.push(new OrbitDrawer(30, ORBIT_SEGMENTS));
-    orbitDrawers.push(new OrbitDrawer(35, ORBIT_SEGMENTS));
-    orbitDrawers.push(new OrbitDrawer(40, ORBIT_SEGMENTS));
+    orbitDrawers.push(new OrbitDrawer(9.23, ORBIT_SEGMENTS));
+    orbitDrawers.push(new OrbitDrawer(12.82, ORBIT_SEGMENTS));
+    orbitDrawers.push(new OrbitDrawer(19.49, ORBIT_SEGMENTS));
+    orbitDrawers.push(new OrbitDrawer(66.67, ORBIT_SEGMENTS));
+    orbitDrawers.push(new OrbitDrawer(122.82, ORBIT_SEGMENTS));
+    orbitDrawers.push(new OrbitDrawer(246.41, ORBIT_SEGMENTS));
+    orbitDrawers.push(new OrbitDrawer(385.26, ORBIT_SEGMENTS));
 
 	LoadTexturefromUrl(sunmapUrl, meshDrawer1)
-	LoadObjfromUrl(sunUrl, meshDrawer1);
+	LoadSunfromUrl(sunUrl, meshDrawer1);
 	LoadTexturefromUrl(mercurymapUrl, meshDrawer2);
-	LoadObjfromUrl(mercuryUrl, meshDrawer2);
+	LoadMercuryfromUrl(mercuryUrl, meshDrawer2);
 	LoadTexturefromUrl(venusmapUrl, meshDrawer3);
-	LoadObjfromUrl(venusUrl, meshDrawer3);
+	LoadVenusfromUrl(venusUrl, meshDrawer3);
 	LoadTexturefromUrl(earthmapUrl, meshDrawer4);
-	LoadObjfromUrl(earthUrl, meshDrawer4);
+	LoadEarthfromUrl(earthUrl, meshDrawer4);
 	LoadTexturefromUrl(marsmapUrl, meshDrawer5);
-	LoadObjfromUrl(marsUrl, meshDrawer5);
+	LoadMarsfromUrl(marsUrl, meshDrawer5);
 	LoadTexturefromUrl(jupmapUrl, meshDrawer6);
-	LoadObjfromUrl(jupUrl, meshDrawer6);
+	LoadJupiterfromUrl(jupUrl, meshDrawer6);
 	LoadTexturefromUrl(satmapUrl, meshDrawer7);
-	LoadObjfromUrl(satUrl, meshDrawer7);
+	LoadSaturnfromUrl(satUrl, meshDrawer7);
 	LoadTexturefromUrl(urmapUrl, meshDrawer8);
-	LoadObjfromUrl(urUrl, meshDrawer8);
+	LoadUranfromUrl(urUrl, meshDrawer8);
 	LoadTexturefromUrl(nepmapUrl, meshDrawer9);
-	LoadObjfromUrl(nepUrl, meshDrawer9);
+	LoadNepfromUrl(nepUrl, meshDrawer9);
 	
 	// Set the viewport size
 	UpdateCanvasSize();
@@ -228,7 +228,8 @@ function InitWebGL()
 	const anim_checkbox = document.getElementById('animateCheckbox');
     anim_checkbox.addEventListener('change', () => toggleAnimation(anim_checkbox))
 	toggleAnimation(anim_checkbox);
-	document.getElementById('orbitCheckbox').addEventListener('change', function() {
+	const orbit_check = document.getElementById('orbitCheckbox')
+    orbit_check.addEventListener('change', function() {
 		orbitsActive = this.checked;
 		DrawScene();
 	});
@@ -253,10 +254,10 @@ function UpdateCanvasSize()
 function UpdateProjectionMatrix() 
 {
 	var r = canvas.width / canvas.height;
-	var n = (transZ - 174);
+	var n = (transZ - 390);
 	const min_n = 0.001;
 	if (n < min_n) n = min_n;
-	var f = (transZ + 174);
+	var f = (transZ + 390);
 	var fov = 3.145 * 60 / 180;
 	var s = 1 / Math.tan(fov / 2);
 	perspectiveMatrix = [
@@ -365,31 +366,31 @@ function DrawScene()
 	var mv2 = GetModelViewMatrix(pos2.x, pos2.y, transZ + pos2.z, 0, autorot2 + Autorot2);
 	var mvp2 = MatrixMult(perspectiveMatrix, mv2);
 
-	var pos3 = getTranslationPosition(10, Autorot3, rotX, rotY);
+	var pos3 = getTranslationPosition(9.23, Autorot3, rotX, rotY);
 	var mv3 = GetModelViewMatrix(pos3.x, pos3.y, transZ + pos3.z, 0, autorot3 + Autorot3);
 	var mvp3 = MatrixMult(perspectiveMatrix, mv3);
 
-	var pos4 = getTranslationPosition(15, Autorot4, rotX, rotY);
+	var pos4 = getTranslationPosition(12.82, Autorot4, rotX, rotY);
 	var mv4 = GetModelViewMatrix(pos4.x, pos4.y, transZ + pos4.z, 0, autorot4 + Autorot4);
 	var mvp4 = MatrixMult(perspectiveMatrix, mv4);
 
-	var pos5 = getTranslationPosition(20, Autorot5, rotX, rotY);
+	var pos5 = getTranslationPosition(19.49, Autorot5, rotX, rotY);
 	var mv5 = GetModelViewMatrix(pos5.x, pos5.y, transZ + pos5.z, 0, autorot5 + Autorot5);
 	var mvp5 = MatrixMult(perspectiveMatrix, mv5);
 
-	var pos6 = getTranslationPosition(25, Autorot6, rotX, rotY);
+	var pos6 = getTranslationPosition(66.67, Autorot6, rotX, rotY);
 	var mv6 = GetModelViewMatrix(pos6.x, pos6.y, transZ + pos6.z, 0, autorot6 + Autorot6);
 	var mvp6 = MatrixMult(perspectiveMatrix, mv6);
 
-	var pos7 = getTranslationPosition(30, Autorot7, rotX, rotY);
+	var pos7 = getTranslationPosition(122.82, Autorot7, rotX, rotY);
 	var mv7 = GetModelViewMatrix(pos7.x, pos7.y, transZ + pos7.z, 0, autorot7 + Autorot7);
 	var mvp7 = MatrixMult(perspectiveMatrix, mv7);
 
-	var pos8 = getTranslationPosition(35, Autorot8, rotX, rotY);
+	var pos8 = getTranslationPosition(246.41, Autorot8, rotX, rotY);
 	var mv8 = GetModelViewMatrix(pos8.x, pos8.y, transZ + pos8.z, 0, autorot8 + Autorot8);
 	var mvp8 = MatrixMult(perspectiveMatrix, mv8);
 
-	var pos9 = getTranslationPosition(40, Autorot9, rotX, rotY);
+	var pos9 = getTranslationPosition(385.26, Autorot9, rotX, rotY);
 	var mv9 = GetModelViewMatrix(pos9.x, pos9.y, transZ + pos9.z, 0, autorot9 + Autorot9);
 	var mvp9 = MatrixMult(perspectiveMatrix, mv9);
 	
@@ -601,7 +602,7 @@ function ShowTexture( param )
 }
 
 
-function LoadObjfromUrl(githubUrl, drawer) {
+function LoadSunfromUrl(githubUrl, drawer) {
 fetch(githubUrl)
 	.then(response => response.text())
 	.then(objText => {
@@ -609,14 +610,14 @@ fetch(githubUrl)
 		mesh.parse(objText);
 		var box = mesh.getBoundingBox();
 		var shift = [
-			-(box.min[0] + box.max[0]) / 2,
-			-(box.min[1] + box.max[1]) / 2,
-			-(box.min[2] + box.max[2]) / 2
+			-(box.min[0] + box.max[0]) / 4,
+			-(box.min[1] + box.max[1]) / 5,
+			-(box.min[2] + box.max[2]) / 5
 		];
 		var size = [
-			(box.max[0] - box.min[0]) / 2,
-			(box.max[1] - box.min[1]) / 2,
-			(box.max[2] - box.min[2]) / 2
+			(box.max[0] - box.min[0]) / 5,
+			(box.max[1] - box.min[1]) / 5,
+			(box.max[2] - box.min[2]) / 5
 		];
 		var maxSize = Math.max(size[0], size[1], size[2]);
 		var scale = 1 / maxSize;
@@ -631,6 +632,256 @@ fetch(githubUrl)
 		console.error('Error loading OBJ:', error);
 	});
 }
+
+function LoadMercuryfromUrl(githubUrl, drawer) {
+	fetch(githubUrl)
+		.then(response => response.text())
+		.then(objText => {
+			var mesh = new ObjMesh();
+			mesh.parse(objText);
+			var box = mesh.getBoundingBox();
+			var shift = [
+				-(box.min[0] + box.max[0]) / (100 * 0.0035),
+				-(box.min[1] + box.max[1]) / (100 * 0.0035),
+				-(box.min[2] + box.max[2]) / (100 * 0.0035)
+			];
+			var size = [
+				(box.max[0] - box.min[0]) / (100 * 0.0035),
+				(box.max[1] - box.min[1]) / (100 * 0.0035),
+				(box.max[2] - box.min[2]) / (100 * 0.0035)
+			];
+			var maxSize = Math.max(size[0], size[1], size[2]);
+			var scale = 1 / maxSize;
+			mesh.shiftAndScale(shift, scale);
+			var buffers = mesh.getVertexBuffers();
+	
+			drawer.setMesh(buffers.positionBuffer, buffers.texCoordBuffer);                   
+				
+			DrawScene();
+		})
+		.catch(error => {
+			console.error('Error loading OBJ:', error);
+		});
+	}
+
+    
+function LoadVenusfromUrl(githubUrl, drawer) {
+	fetch(githubUrl)
+		.then(response => response.text())
+		.then(objText => {
+			var mesh = new ObjMesh();
+			mesh.parse(objText);
+			var box = mesh.getBoundingBox();
+			var shift = [
+				-(box.min[0] + box.max[0]) / (100 * 0.0087),
+				-(box.min[1] + box.max[1]) / (100 * 0.0087),
+				-(box.min[2] + box.max[2]) / (100 * 0.0087)
+			];
+			var size = [
+				(box.max[0] - box.min[0]) / (100 * 0.0087),
+				(box.max[1] - box.min[1]) / (100 * 0.0087), 
+				(box.max[2] - box.min[2]) / (100 * 0.0087)
+			];
+			var maxSize = Math.max(size[0], size[1], size[2]);
+			var scale = 1 / maxSize;
+			mesh.shiftAndScale(shift, scale);
+			var buffers = mesh.getVertexBuffers();
+	
+			drawer.setMesh(buffers.positionBuffer, buffers.texCoordBuffer);                   
+				
+			DrawScene();
+		})
+		.catch(error => {
+			console.error('Error loading OBJ:', error);
+		});
+	}
+	
+	
+function LoadEarthfromUrl(githubUrl, drawer) {
+	fetch(githubUrl)
+		.then(response => response.text())
+		.then(objText => {
+			var mesh = new ObjMesh();
+			mesh.parse(objText);
+			var box = mesh.getBoundingBox();
+			var shift = [
+				-(box.min[0] + box.max[0]) / (100 * 0.0092),
+				-(box.min[1] + box.max[1]) / (100 * 0.0092),
+				-(box.min[2] + box.max[2]) / (100 *0.0092)
+			];
+			var size = [
+				(box.max[0] - box.min[0]) / (100 * 0.0092),
+				(box.max[1] - box.min[1]) / (100 * 0.0092),
+				(box.max[2] - box.min[2]) / (100 * 0.0092) 
+			];
+			var maxSize = Math.max(size[0], size[1], size[2]);
+			var scale = 1 / maxSize;
+			mesh.shiftAndScale(shift, scale);
+			var buffers = mesh.getVertexBuffers();
+	
+			drawer.setMesh(buffers.positionBuffer, buffers.texCoordBuffer);                   
+				
+			DrawScene();
+		})
+		.catch(error => {
+			console.error('Error loading OBJ:', error);
+		});
+	}
+	
+function LoadMarsfromUrl(githubUrl, drawer) {
+	fetch(githubUrl)
+		.then(response => response.text())
+		.then(objText => {
+			var mesh = new ObjMesh();
+			mesh.parse(objText);
+			var box = mesh.getBoundingBox();
+			var shift = [
+				-(box.min[0] + box.max[0]) / (100 * 0.0049),
+				-(box.min[1] + box.max[1]) / (100 * 0.0049),
+				-(box.min[2] + box.max[2]) / (100 * 0.0049)
+			];
+			var size = [
+				(box.max[0] - box.min[0]) / (100 * 0.0049),
+				(box.max[1] - box.min[1]) / (100 * 0.0049),
+				(box.max[2] - box.min[2]) / (100 * 0.0049)
+			];
+			var maxSize = Math.max(size[0], size[1], size[2]);
+			var scale = 1 / maxSize;
+			mesh.shiftAndScale(shift, scale);
+			var buffers = mesh.getVertexBuffers();
+	
+			drawer.setMesh(buffers.positionBuffer, buffers.texCoordBuffer);                   
+				
+			DrawScene();
+		})
+		.catch(error => {
+			console.error('Error loading OBJ:', error);
+		});
+	}
+	
+function LoadJupiterfromUrl(githubUrl, drawer) {
+	fetch(githubUrl)
+		.then(response => response.text())
+		.then(objText => {
+			var mesh = new ObjMesh();
+			mesh.parse(objText);
+			var box = mesh.getBoundingBox();
+			var shift = [
+				-(box.min[0] + box.max[0]) / (50 * 0.1005) ,
+				-(box.min[1] + box.max[1]) / (50 * 0.1005),
+				-(box.min[2] + box.max[2]) / (50 * 0.1005)
+			];
+			var size = [
+				(box.max[0] - box.min[0]) / (50 * 0.1005),
+				(box.max[1] - box.min[1]) / (50 * 0.1005),
+				(box.max[2] - box.min[2]) / (50 * 0.1005)
+			];
+			var maxSize = Math.max(size[0], size[1], size[2]);
+			var scale = 1 / maxSize;
+			mesh.shiftAndScale(shift, scale);
+			var buffers = mesh.getVertexBuffers();
+	
+			drawer.setMesh(buffers.positionBuffer, buffers.texCoordBuffer);                   
+				
+			DrawScene();
+		})
+		.catch(error => {
+			console.error('Error loading OBJ:', error);
+		});
+	}
+	
+function LoadSaturnfromUrl(githubUrl, drawer) {
+	fetch(githubUrl)
+		.then(response => response.text())
+		.then(objText => {
+			var mesh = new ObjMesh();
+			mesh.parse(objText);
+			var box = mesh.getBoundingBox();
+			var shift = [
+				-(box.min[0] + box.max[0]) / (50 * 0.0837),
+				-(box.min[1] + box.max[1]) / (50 * 0.0837),
+				-(box.min[2] + box.max[2]) / (50 * 0.0837)
+			];
+			var size = [
+				(box.max[0] - box.min[0]) / (50 * 0.0837),
+				(box.max[1] - box.min[1]) / (50 * 0.0837),
+				(box.max[2] - box.min[2]) / (50 * 0.0837)
+			];
+			var maxSize = Math.max(size[0], size[1], size[2]);
+			var scale = 1 / maxSize;
+			mesh.shiftAndScale(shift, scale);
+			var buffers = mesh.getVertexBuffers();
+	
+			drawer.setMesh(buffers.positionBuffer, buffers.texCoordBuffer);                   
+				
+			DrawScene();
+		})
+		.catch(error => {
+			console.error('Error loading OBJ:', error);
+		});
+	}
+	
+function LoadUranfromUrl(githubUrl, drawer) {
+	fetch(githubUrl)
+		.then(response => response.text())
+		.then(objText => {
+			var mesh = new ObjMesh();
+			mesh.parse(objText);
+			var box = mesh.getBoundingBox();
+			var shift = [
+				-(box.min[0] + box.max[0]) / (50 * 0.0365),
+				-(box.min[1] + box.max[1]) / (50 * 0.0365),
+				-(box.min[2] + box.max[2]) / (50 * 0.0365)
+			];
+			var size = [
+				(box.max[0] - box.min[0]) / (50 * 0.0365),
+				(box.max[1] - box.min[1]) / (50 * 0.0365),
+				(box.max[2] - box.min[2]) / (50 * 0.0365)
+			];
+			var maxSize = Math.max(size[0], size[1], size[2]);
+			var scale = 1 / maxSize;
+			mesh.shiftAndScale(shift, scale);
+			var buffers = mesh.getVertexBuffers();
+	
+			drawer.setMesh(buffers.positionBuffer, buffers.texCoordBuffer);                   
+				
+			DrawScene();
+		})
+		.catch(error => {
+			console.error('Error loading OBJ:', error);
+		});
+	}
+	
+function LoadNepfromUrl(githubUrl, drawer) {
+	fetch(githubUrl)
+		.then(response => response.text())
+		.then(objText => {
+			var mesh = new ObjMesh();
+			mesh.parse(objText);
+			var box = mesh.getBoundingBox();
+			var shift = [
+				-(box.min[0] + box.max[0]) / (50 * 0.0354),
+				-(box.min[1] + box.max[1]) / (50 * 0.0354),
+				-(box.min[2] + box.max[2]) / (50 * 0.0354)
+			];
+			var size = [
+				(box.max[0] - box.min[0]) / (50 * 0.0354),
+				(box.max[1] - box.min[1]) / (50 * 0.0354),
+				(box.max[2] - box.min[2]) / (50 * 0.0354)
+			];
+			var maxSize = Math.max(size[0], size[1], size[2]);
+			var scale = 1 / maxSize;
+			mesh.shiftAndScale(shift, scale);
+			var buffers = mesh.getVertexBuffers();
+	
+			drawer.setMesh(buffers.positionBuffer, buffers.texCoordBuffer);                   
+				
+			DrawScene();
+		})
+		.catch(error => {
+			console.error('Error loading OBJ:', error);
+		});
+	}
 
 function LoadTexturefromUrl(textureUrl, drawer) {
 	fetch(textureUrl)
@@ -736,7 +987,7 @@ class MeshDrawer {
 		if (this.showTextureFlag && this.texture) {
 			gl.bindBuffer(gl.ARRAY_BUFFER, this.textureCoordBuffer);
 			gl.enableVertexAttribArray(this.texCoord);
-			gl.vertexAttribPointer(this.texCoord, 2, gl.FLOAT, false, 0, 0); // <--- Inserisci qui
+			gl.vertexAttribPointer(this.texCoord, 2, gl.FLOAT, false, 0, 0); 
 	
 			gl.activeTexture(gl.TEXTURE0);
 			gl.bindTexture(gl.TEXTURE_2D, this.texture);
