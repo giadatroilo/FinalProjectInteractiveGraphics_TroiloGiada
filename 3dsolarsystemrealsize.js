@@ -896,31 +896,50 @@ function LoadTexturefromUrl(textureUrl, drawer) {
 			console.error('Error loading texture:', error);
 		});
 }
+function GetModelViewMatrix( translationX, translationY, translationZ, rotationX, rotationY )
+{
+	var transl= [
+		[1, 0, 0, translationX],
+		[0, 1, 0, translationY],
+		[0, 0, 1, translationZ],
+		[0, 0, 0, 1]
+	];
+	
+	var rotx=[
+		[1, 0, 0, 0],
+		[0, Math.cos(-rotationX), Math.sin(-rotationX), 0],
+		[0, -Math.sin(-rotationX), Math.cos(-rotationX), 0], 
+		[0, 0, 0, 1]
+	];
 
-function GetModelViewMatrix(translationX, translationY, translationZ, rotationX, rotationY) {
-    var trans = [
-        1, 0, 0, 0,
-        0, 1, 0, 0,
-        0, 0, 1, 0,
-        translationX, translationY, translationZ, 1
-    ];
+	var roty=[
+		[Math.cos(-rotationY), 0, -Math.sin(-rotationY), 0 ],
+		[0, 1, 0, 0],
+		[Math.sin(-rotationY), 0, Math.cos(-rotationY), 0 ],
+		[0, 0, 0, 1]
+	];
 
-    var rotX = [
-        1, 0, 0, 0,
-        0, Math.cos(rotationX), Math.sin(rotationX), 0,
-        0, -Math.sin(rotationX), Math.cos(rotationX), 0,
-        0, 0, 0, 1
-    ];
+	transl = ColumnMajorOrder(transl);
+	rotx = ColumnMajorOrder(rotx);
+	roty = ColumnMajorOrder(roty)
+	 
+	var trans1 = MatrixMult(transl, rotx);  
+    var trans2 = MatrixMult(trans1, roty);    
 
-    var rotY = [
-        Math.cos(rotationY), 0, -Math.sin(rotationY), 0,
-        0, 1, 0, 0,
-        Math.sin(rotationY), 0, Math.cos(rotationY), 0,
-        0, 0, 0, 1
-    ];
+	var mv = trans2;
+	return mv;
+}
 
-    var mv = MatrixMult(trans, MatrixMult(rotY, rotX));  
-    return mv;
+function ColumnMajorOrder(mat){
+	var vec=[];
+	var rows=mat.length;
+	var col=mat[0].length;
+	for (var j=0; j<col; j++){
+		for (var i=0; i<rows; i++){
+			vec.push(mat[i][j]);  
+		}
+	}
+	return vec;
 }
 
 class MeshDrawer {
