@@ -1,38 +1,43 @@
 document.addEventListener('DOMContentLoaded', () => {
+    // Select all elements with the class 'planet' and the element with the class 'sun'
     const planets = document.querySelectorAll('.planet');
     const sun = document.querySelector('.sun');
 
     planets.forEach(planet => {
+        // Add a 'mouseover' event listener to each planet
         planet.addEventListener('mouseover', () => {
             const planetTitle = planet.getAttribute('title');
-            planet.setAttribute('title', planetTitle); // Assicura che l'attributo title sia impostato correttamente
+            planet.setAttribute('title', planetTitle); 
         });
 
+        // Add a 'click' event listener to each planet
         planet.addEventListener('click', () => {
             const planetName = planet.getAttribute('data-planet');
             handlePlanetClick(planetName);
         });
     });
 
+    // Add a 'mouseover' event listener to the sun
     sun.addEventListener('mouseover', () => {
         const sunTitle = sun.getAttribute('title');
-        sun.setAttribute('title', sunTitle); // Assicura che l'attributo title sia impostato correttamente
+        sun.setAttribute('title', sunTitle); 
     });
 
+    // Add a 'click' event listener to the sun
     sun.addEventListener('click', () => {
         const planetName = sun.getAttribute('data-planet');
         handlePlanetClick(planetName);
     });
 
-    // Funzione per impostare la scala
+    // Function to set the scale
     function SetScale(input) {
-        // Legge il valore di input e lo converte in float
+        // Read the input value and convert it to a float
         var scale = parseFloat(input.value);
 
-        // Aggiorna il valore di scala mostrato accanto all'input
+        // Update the scale value displayed next to the input
         document.getElementById('scale-value').innerText = scale.toFixed(2);
 
-        // Aggiorna le velocità utilizzando il valore di scale
+        // Update the speeds using the scale value
         const speeds = {
             Mercury: 47.9 * scale,
             Venus: 35.0 * scale,
@@ -55,7 +60,6 @@ document.addEventListener('DOMContentLoaded', () => {
             Neptune: 2680 * scale
         }; // m/s
 
-        
         const sunspeed = 1933 * scale; // m/s
         return {
             speeds: speeds,
@@ -64,42 +68,42 @@ document.addEventListener('DOMContentLoaded', () => {
         };
     }
 
-    let animationEnabled = false; // Flag per controllare lo stato dell'animazione
+    let animationEnabled = false; // Flag to control the animation state
 
-    // Funzione per gestire il click su un pianeta
+    // Function to handle a planet click
     function handlePlanetClick(planetName) {
         switch (planetName) {
             case 'Mercury':
-                window.location.href = 'planet3d/mercury.html'; // Sostituisci con il percorso del tuo file per Mercurio
+                window.location.href = 'planet3d/mercury.html'; 
                 break;
             case 'Venus':
-                window.location.href = 'planet3d/venus.html'; // Sostituisci con il percorso del tuo file per Venere
+                window.location.href = 'planet3d/venus.html';
                 break;
             case 'Earth':
-                window.location.href = 'planet3d/earth.html'; // Sostituisci con il percorso del tuo file per la Terra
+                window.location.href = 'planet3d/earth.html'; 
                 break;
             case 'Mars':
-                window.location.href = 'planet3d/mars.html'; // Sostituisci con il percorso del tuo file per Marte
+                window.location.href = 'planet3d/mars.html'; 
                 break;
             case 'Jupiter':
-                window.location.href = 'planet3d/jupiter.html'; // Sostituisci con il percorso del tuo file per Giove
+                window.location.href = 'planet3d/jupiter.html';
                 break;
             case 'Saturn':
-                window.location.href = 'planet3d/saturn.html'; // Sostituisci con il percorso del tuo file per Saturno
+                window.location.href = 'planet3d/saturn.html'; 
                 break;
             case 'Uranus':
-                window.location.href = 'planet3d/uranus.html'; // Sostituisci con il percorso del tuo file per Urano
+                window.location.href = 'planet3d/uranus.html'; 
                 break;
             case 'Neptune':
-                window.location.href = 'planet3d/neptune.html'; // Sostituisci con il percorso del tuo file per Nettuno
+                window.location.href = 'planet3d/neptune.html'; 
                 break;
             case 'Sun':
-                window.location.href = 'planet3d/sun.html'; // Sostituisci con il percorso del tuo file per il Sole
+                window.location.href = 'planet3d/sun.html'; 
                 break;
         }
     }
 
-
+    // Function to animate the planets
     function animatePlanets(timestamp) {
         if (!animationEnabled) {
             return; 
@@ -110,7 +114,6 @@ document.addEventListener('DOMContentLoaded', () => {
             const planetName = planet.classList[1];
             const speed = speeds[planetName];
             const internalspeed = internalspeeds[planetName];
-            const planetradius = planet.clientWidth / 2;
             const radius = orbit.clientWidth / 2;
             const time = timestamp * 0.00001 * speed;
             const internaltime = timestamp * 0.00001 * internalspeed;
@@ -128,18 +131,18 @@ document.addEventListener('DOMContentLoaded', () => {
         requestAnimationFrame(animatePlanets);
     }
 
-    // Gestisci il cambio di stato del checkbox per l'animazione
+    // Handle the change of the animation checkbox state
     const animateCheckbox = document.getElementById('animateCheckbox');
     if (animateCheckbox) {
         animateCheckbox.addEventListener('change', () => {
             animationEnabled = animateCheckbox.checked;
             if (animationEnabled) {
-                // Riavvia l'animazione se è stata riattivata
+                // Restart the animation if it has been re-enabled
                 animatePlanets(performance.now());
             }
         });
     }
 
-    // Avvia l'animazione dei pianeti
+    // Start the animation of the planets
     animatePlanets(performance.now());
 });
