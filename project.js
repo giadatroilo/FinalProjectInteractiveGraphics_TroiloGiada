@@ -1,13 +1,6 @@
 document.addEventListener('DOMContentLoaded', () => {
     const planets = document.querySelectorAll('.planet');
     const sun = document.querySelector('.sun');
-    const solarSystemSection = document.querySelector('.solar-system-section');
-
-    solarSystemSection.addEventListener('click', (event) => {
-        if (event.target === solarSystemSection) {
-            window.location.href = '3D solar system.html'; // Sostituisci con il percorso del tuo file desiderato
-        }
-    });
 
     planets.forEach(planet => {
         planet.addEventListener('mouseover', () => {
@@ -21,7 +14,6 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-    // Aggiungi evento mouseover per il sole
     sun.addEventListener('mouseover', () => {
         const sunTitle = sun.getAttribute('title');
         sun.setAttribute('title', sunTitle); // Assicura che l'attributo title sia impostato correttamente
