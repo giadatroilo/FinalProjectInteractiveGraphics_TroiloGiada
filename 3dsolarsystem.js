@@ -47,7 +47,6 @@ class BoxDrawer {
 		gl.drawElements( gl.LINES, 24, gl.UNSIGNED_BYTE, 0 );
 	}
 }
-
 // Vertex shader source code
 var boxVS = `
 	attribute vec3 pos;
@@ -69,6 +68,7 @@ var boxFS = `
 ///////////////////////////////////////////////////////////////////////////////////
 // Below is the cclass for drawing the orbits
 ///////////////////////////////////////////////////////////////////////////////////
+
 
 class OrbitDrawer {
     constructor(radius, segments) {
@@ -105,7 +105,7 @@ class OrbitDrawer {
         gl.bindBuffer(gl.ARRAY_BUFFER, this.vertbuffer);
         gl.vertexAttribPointer(this.vertPos, 3, gl.FLOAT, false, 0, 0);
         gl.enableVertexAttribArray(this.vertPos);
-        gl.drawArrays(gl.LINE_LOOP, 0, 101); 
+        gl.drawArrays(gl.LINE_LOOP, 0, 101); // 101 vertices for the orbit
 	}
 }
 
@@ -117,7 +117,6 @@ var orbitVS = `
 		gl_Position = mvp * vec4(pos, 1.0);
 	}
 `;
-
 // Fragment shader source code
 var orbitFS = `
 	precision mediump float;
@@ -159,7 +158,7 @@ var urmapUrl = 'https://raw.githubusercontent.com/giadatroilo/FinalProjectIntera
 var nepmapUrl = 'https://raw.githubusercontent.com/giadatroilo/FinalProjectInteractiveGraphics_TroiloGiada/main/img/Neptune/neptunemap.jpg'
 
 var canvas, gl;
-var perspectiveMatrix;	
+var perspectiveMatrix;	// perspective projection matrix
 var rotX=0, rotY=0, transZ=50;
 var autorot1 = 0, autorot2 = 0, autorot3 = 0, autorot4 = 0, autorot5 = 0, autorot6 = 0, autorot7 = 0, autorot8 = 0, autorot9 = 0;
 var Autorot2 = 0, Autorot3 = 0, Autorot4 = 0, Autorot5 = 0, Autorot6 = 0, Autorot7 = 0, Autorot8 = 0, Autorot9 = 0;
@@ -225,6 +224,7 @@ function InitWebGL()
 	// Set the viewport size
 	UpdateCanvasSize();
 
+	const scale = SetScale(document.getElementById('scale-input'));
 	const anim_checkbox = document.getElementById('animateCheckbox');
     anim_checkbox.addEventListener('change', () => toggleAnimation(anim_checkbox))
 	toggleAnimation(anim_checkbox);
@@ -266,6 +266,7 @@ function UpdateProjectionMatrix()
 		0, 0, -2 * n * f / (f - n), 0
 	];
 }
+
 
 function toggleAnimation(checkbox) {
     animationActive = checkbox.checked;
@@ -353,7 +354,6 @@ function UpdateScene2()
 		requestAnimationFrame(UpdateScene2);
 	}
 }
-
 // This is the main function that handled WebGL drawing
 function DrawScene() 
 {
@@ -419,6 +419,7 @@ function DrawScene()
 	meshDrawer8.draw(mvp8);
 	meshDrawer9.draw(mvp9);
 }
+
 
 function inverseMatrix3x3(m) {
     var det = m[0][0] * (m[1][1] * m[2][2] - m[1][2] * m[2][1]) -
@@ -534,6 +535,8 @@ function CompileShader( type, source )
 	return shader;
 }
 
+// Multiplies two matrices and returns the result A*B.
+// The arguments A and B are arrays, representing column-major matrices.
 function MatrixMult( A, B )
 {
 	var C = [];
@@ -548,6 +551,8 @@ function MatrixMult( A, B )
 	}
 	return C;
 }
+
+var showBox = true;
 
 window.onload = function() {
 	InitWebGL();
@@ -594,6 +599,7 @@ function ShowTexture( param )
 	meshDrawer.showTexture( param.checked );
 	DrawScene();
 }
+
 
 function LoadObjfromUrl(githubUrl, drawer) {
 fetch(githubUrl)
@@ -643,30 +649,51 @@ function LoadTexturefromUrl(textureUrl, drawer) {
 		});
 }
 
-function GetModelViewMatrix(translationX, translationY, translationZ, rotationX, rotationY) {
-    var trans = [
-        1, 0, 0, 0,
-        0, 1, 0, 0,
-        0, 0, 1, 0,
-        translationX, translationY, translationZ, 1
-    ];
+function GetModelViewMatrix( translationX, translationY, translationZ, rotationX, rotationY )
+{
+	var transl= [
+		[1, 0, 0, translationX],
+		[0, 1, 0, translationY],
+		[0, 0, 1, translationZ],
+		[0, 0, 0, 1]
+	];
+	
+	var rotx=[
+		[1, 0, 0, 0],
+		[0, Math.cos(-rotationX), Math.sin(-rotationX), 0],
+		[0, -Math.sin(-rotationX), Math.cos(-rotationX), 0], 
+		[0, 0, 0, 1]
+	];
 
-    var rotX = [
-        1, 0, 0, 0,
-        0, Math.cos(rotationX), Math.sin(rotationX), 0,
-        0, -Math.sin(rotationX), Math.cos(rotationX), 0,
-        0, 0, 0, 1
-    ];
+	var roty=[
+		[Math.cos(-rotationY), 0, -Math.sin(-rotationY), 0 ],
+		[0, 1, 0, 0],
+		[Math.sin(-rotationY), 0, Math.cos(-rotationY), 0 ],
+		[0, 0, 0, 1]
+	];
 
-    var rotY = [
-        Math.cos(rotationY), 0, -Math.sin(rotationY), 0,
-        0, 1, 0, 0,
-        Math.sin(rotationY), 0, Math.cos(rotationY), 0,
-        0, 0, 0, 1
-    ];
+	transl = ColumnMajorOrder(transl);
+	rotx = ColumnMajorOrder(rotx);
+	roty = ColumnMajorOrder(roty)
+	// first rotationx then rotationY and at least translation 
+	var trans1 = MatrixMult(transl, rotx);  
+    var trans2 = MatrixMult(trans1, roty);    
 
-    var mv = MatrixMult(trans, MatrixMult(rotY, rotX));  
-    return mv;
+	var mv = trans2;
+	return mv;
+}
+
+function ColumnMajorOrder(matri){
+	var vec=[];
+	var righe=matri.length;
+	var colonne=matri[0].length;
+	for (var j=0; j<colonne; j++){
+		for (var i=0; i<righe; i++){
+			vec.push(matri[i][j]);  
+		}
+	}
+
+	return vec;
 }
 
 class MeshDrawer {
