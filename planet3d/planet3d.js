@@ -1,4 +1,3 @@
-
 function GetModelViewMatrix( translationX, translationY, translationZ, rotationX, rotationY )
 {
 	var transl= [
@@ -25,7 +24,7 @@ function GetModelViewMatrix( translationX, translationY, translationZ, rotationX
 	transl = ColumnMajorOrder(transl);
 	rotx = ColumnMajorOrder(rotx);
 	roty = ColumnMajorOrder(roty)
-	// first rotationx then rotationY and at least translation 
+	
 	var trans1 = MatrixMult(transl, rotx);  
     var trans2 = MatrixMult(trans1, roty);    
 

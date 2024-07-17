@@ -41,6 +41,7 @@
 		gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.linebuffer);
 		gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint8Array(line), gl.STATIC_DRAW);
 		}
+
 		draw( trans )
 		{
 			// Draw the line segments
@@ -53,6 +54,7 @@
 			gl.drawElements( gl.LINES, 24, gl.UNSIGNED_BYTE, 0 );
 		}
 	}
+	
 	// Vertex shader source code
 	var boxVS = `
 		attribute vec3 pos;

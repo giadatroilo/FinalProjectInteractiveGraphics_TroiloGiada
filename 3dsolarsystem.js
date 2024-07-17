@@ -47,6 +47,7 @@ class BoxDrawer {
 		gl.drawElements( gl.LINES, 24, gl.UNSIGNED_BYTE, 0 );
 	}
 }
+
 // Vertex shader source code
 var boxVS = `
 	attribute vec3 pos;
@@ -68,7 +69,6 @@ var boxFS = `
 ///////////////////////////////////////////////////////////////////////////////////
 // Below is the cclass for drawing the orbits
 ///////////////////////////////////////////////////////////////////////////////////
-
 
 class OrbitDrawer {
     constructor(radius, segments) {
@@ -105,7 +105,7 @@ class OrbitDrawer {
         gl.bindBuffer(gl.ARRAY_BUFFER, this.vertbuffer);
         gl.vertexAttribPointer(this.vertPos, 3, gl.FLOAT, false, 0, 0);
         gl.enableVertexAttribArray(this.vertPos);
-        gl.drawArrays(gl.LINE_LOOP, 0, 101); // 101 vertices for the orbit
+        gl.drawArrays(gl.LINE_LOOP, 0, 101); 
 	}
 }
 
@@ -117,6 +117,7 @@ var orbitVS = `
 		gl_Position = mvp * vec4(pos, 1.0);
 	}
 `;
+
 // Fragment shader source code
 var orbitFS = `
 	precision mediump float;
@@ -158,7 +159,7 @@ var urmapUrl = 'https://raw.githubusercontent.com/giadatroilo/FinalProjectIntera
 var nepmapUrl = 'https://raw.githubusercontent.com/giadatroilo/FinalProjectInteractiveGraphics_TroiloGiada/main/img/Neptune/neptunemap.jpg'
 
 var canvas, gl;
-var perspectiveMatrix;	// perspective projection matrix
+var perspectiveMatrix;	
 var rotX=0, rotY=0, transZ=50;
 var autorot1 = 0, autorot2 = 0, autorot3 = 0, autorot4 = 0, autorot5 = 0, autorot6 = 0, autorot7 = 0, autorot8 = 0, autorot9 = 0;
 var Autorot2 = 0, Autorot3 = 0, Autorot4 = 0, Autorot5 = 0, Autorot6 = 0, Autorot7 = 0, Autorot8 = 0, Autorot9 = 0;
@@ -224,7 +225,6 @@ function InitWebGL()
 	// Set the viewport size
 	UpdateCanvasSize();
 
-	const scale = SetScale(document.getElementById('scale-input'));
 	const anim_checkbox = document.getElementById('animateCheckbox');
     anim_checkbox.addEventListener('change', () => toggleAnimation(anim_checkbox))
 	toggleAnimation(anim_checkbox);
@@ -354,6 +354,7 @@ function UpdateScene2()
 		requestAnimationFrame(UpdateScene2);
 	}
 }
+
 // This is the main function that handled WebGL drawing
 function DrawScene() 
 {
@@ -419,7 +420,6 @@ function DrawScene()
 	meshDrawer8.draw(mvp8);
 	meshDrawer9.draw(mvp9);
 }
-
 
 function inverseMatrix3x3(m) {
     var det = m[0][0] * (m[1][1] * m[2][2] - m[1][2] * m[2][1]) -
@@ -535,8 +535,6 @@ function CompileShader( type, source )
 	return shader;
 }
 
-// Multiplies two matrices and returns the result A*B.
-// The arguments A and B are arrays, representing column-major matrices.
 function MatrixMult( A, B )
 {
 	var C = [];
@@ -551,8 +549,6 @@ function MatrixMult( A, B )
 	}
 	return C;
 }
-
-var showBox = true;
 
 window.onload = function() {
 	InitWebGL();
@@ -599,7 +595,6 @@ function ShowTexture( param )
 	meshDrawer.showTexture( param.checked );
 	DrawScene();
 }
-
 
 function LoadObjfromUrl(githubUrl, drawer) {
 fetch(githubUrl)
@@ -676,7 +671,7 @@ function GetModelViewMatrix( translationX, translationY, translationZ, rotationX
 	transl = ColumnMajorOrder(transl);
 	rotx = ColumnMajorOrder(rotx);
 	roty = ColumnMajorOrder(roty)
-	// first rotationx then rotationY and at least translation 
+	
 	var trans1 = MatrixMult(transl, rotx);  
     var trans2 = MatrixMult(trans1, roty);    
 
@@ -684,16 +679,15 @@ function GetModelViewMatrix( translationX, translationY, translationZ, rotationX
 	return mv;
 }
 
-function ColumnMajorOrder(matri){
+function ColumnMajorOrder(mat){
 	var vec=[];
-	var righe=matri.length;
-	var colonne=matri[0].length;
-	for (var j=0; j<colonne; j++){
-		for (var i=0; i<righe; i++){
-			vec.push(matri[i][j]);  
+	var rows = mat.length;
+	var col=mat[0].length;
+	for (var j=0; j<col; j++){
+		for (var i=0; i<rows; i++){
+			vec.push(mat[i][j]);  
 		}
 	}
-
 	return vec;
 }
 
