@@ -1,43 +1,34 @@
 document.addEventListener('DOMContentLoaded', () => {
-    // Select all elements with the class 'planet' and the element with the class 'sun'
     const planets = document.querySelectorAll('.planet');
     const sun = document.querySelector('.sun');
 
     planets.forEach(planet => {
-        // Add a 'mouseover' event listener to each planet
         planet.addEventListener('mouseover', () => {
             const planetTitle = planet.getAttribute('title');
             planet.setAttribute('title', planetTitle); 
         });
 
-        // Add a 'click' event listener to each planet
         planet.addEventListener('click', () => {
             const planetName = planet.getAttribute('data-planet');
             handlePlanetClick(planetName);
         });
     });
 
-    // Add a 'mouseover' event listener to the sun
     sun.addEventListener('mouseover', () => {
         const sunTitle = sun.getAttribute('title');
         sun.setAttribute('title', sunTitle); 
     });
 
-    // Add a 'click' event listener to the sun
     sun.addEventListener('click', () => {
         const planetName = sun.getAttribute('data-planet');
         handlePlanetClick(planetName);
     });
 
-    // Function to set the scale
     function SetScale(input) {
-        // Read the input value and convert it to a float
         var scale = parseFloat(input.value);
 
-        // Update the scale value displayed next to the input
         document.getElementById('scale-value').innerText = scale.toFixed(2);
 
-        // Update the speeds using the scale value
         const speeds = {
             Mercury: 47.9 * scale,
             Venus: 35.0 * scale,
@@ -68,9 +59,8 @@ document.addEventListener('DOMContentLoaded', () => {
         };
     }
 
-    let animationEnabled = false; // Flag to control the animation state
+    let animationEnabled = false; 
 
-    // Function to handle a planet click
     function handlePlanetClick(planetName) {
         switch (planetName) {
             case 'Mercury':
@@ -103,7 +93,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // Function to animate the planets
     function animatePlanets(timestamp) {
         if (!animationEnabled) {
             return; 
@@ -131,18 +120,15 @@ document.addEventListener('DOMContentLoaded', () => {
         requestAnimationFrame(animatePlanets);
     }
 
-    // Handle the change of the animation checkbox state
     const animateCheckbox = document.getElementById('animateCheckbox');
     if (animateCheckbox) {
         animateCheckbox.addEventListener('change', () => {
             animationEnabled = animateCheckbox.checked;
             if (animationEnabled) {
-                // Restart the animation if it has been re-enabled
                 animatePlanets(performance.now());
             }
         });
     }
 
-    // Start the animation of the planets
     animatePlanets(performance.now());
 });
