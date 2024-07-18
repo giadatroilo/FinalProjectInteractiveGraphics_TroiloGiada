@@ -224,7 +224,6 @@ function InitWebGL()
 	// Set the viewport size
 	UpdateCanvasSize();
 
-	const scale = SetScale(document.getElementById('scale-input'));
 	const anim_checkbox = document.getElementById('animateCheckbox');
     anim_checkbox.addEventListener('change', () => toggleAnimation(anim_checkbox))
 	toggleAnimation(anim_checkbox);
